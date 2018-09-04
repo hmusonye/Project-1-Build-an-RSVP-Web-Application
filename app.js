@@ -1,7 +1,40 @@
 // get input value
 const form = document.getElementById('registrar');
-let formInput = document.querySelector('input');
+const formInput = document.querySelector('input');
 const ul = document.getElementById('invitedList');
+
+const mainDiv = document.querySelector('.main');
+const div = document.createElement('div');
+const filterLabel = document.createElement('label');
+const filterCheckBox = document.createElement('input');
+filterCheckBox.type = 'checkbox';
+filterLabel.textContent = `Hide those who haven't responded`;
+
+div.appendChild(filterLabel);
+div.appendChild(filterCheckBox);
+
+mainDiv.insertBefore(div, ul);
+
+filterCheckBox.addEventListener('change', (e)=> {
+  const UlListItems = ul.children;
+  const isChecked = e.target.checked;
+
+  if (isChecked){
+    for(i=0; i<UlListItems.length; i++){
+      if(UlListItems[i].className === 'responded'){
+        UlListItems[i].style.display = '';
+      }else{
+        UlListItems[i].style.display = 'none';
+        filterLabel.textContent = `Showing those who have responded`;
+      }
+    }
+  }else{
+    for(i=0; i<UlListItems.length; i++){
+      UlListItems[i].style.display = '';
+      filterLabel.textContent = `Hide those who haven't responded`;
+    }
+  }
+});
 
 // add event listener on form submit
 form.addEventListener('submit', (e) => {
@@ -11,10 +44,10 @@ form.addEventListener('submit', (e) => {
 
   // check for empty string
   if (formInputValue === ''){
-    formInput.placeholder = 'Please Type Something :(';
+    formInput.placeholder = 'Please type a name :(';
   } else {
     addInvitee(formInputValue);
-    formInput.placeholder = 'Invite Someone Else';
+    formInput.placeholder = 'Invite someone else';
   }
   // clear input field
   formInput.value = '';
