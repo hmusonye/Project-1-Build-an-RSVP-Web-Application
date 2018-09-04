@@ -55,8 +55,20 @@ form.addEventListener('submit', (e) => {
 
 // add user input to Invitees invitedList
 function addInvitee(name){
+
+  function createElement(elementName, property, value){
+    let element = document.createElement(elementName);
+    element[property] = value;
+    return element;
+  }
+
+  function appendToLi(elementName, property, value){
+    const element = createElement(elementName, property, value);
+    newLi.appendChild(element);
+    return element;
+  }
+
   // create new li element and add input as text content
-  console.log("name: ", name);
   const newLi = document.createElement('li');
   const span = document.createElement('span');
   span.textContent = name;
@@ -68,22 +80,16 @@ function addInvitee(name){
   checkbox.type = 'checkbox';
 
   // create label, append checkbox to it and append it to li
-  let label = document.createElement('label');
-  label.textContent = 'confirmed';
-  label.appendChild(checkbox);
-  newLi.appendChild(label);
+  appendToLi('label', 'textContent', 'confirmed')
+    .appendChild(createElement('input', 'type', 'checkbox'));
 
   // add remove button
-  const removeButton = document.createElement('button');
-  removeButton.textContent = 'remove';
-  removeButton.className = 'remove';
-  newLi.appendChild(removeButton);
+  appendToLi('button', 'textContent', 'remove');
 
   // add edit button
-  const editButton = document.createElement('button');
-  editButton.textContent = 'edit';
-  editButton.className = 'edit';
-  newLi.appendChild(editButton);
+  appendToLi('button', 'textContent', 'edit');
+
+  return newLi;
 }
 
 // remove, save & edit clicked name
@@ -93,26 +99,29 @@ ul.addEventListener('click', (e)=> {
     const ul = li.parentNode;
     const span = li.firstChild;
     const button = e.target;
+    const buttonAction = e.target.textContent;
+    const actions = {
+      remove: () => ul.removeChild(li),
+      edit: () => {
+        const input = document.createElement('input');
+        input.type = 'text';
+        li.insertBefore(input, span);
+        input.value = span.textContent;
+        button.textContent = 'save';
+        li.removeChild(span);
+      },
+      save: () => {
+        const input = li.firstChild;
+        const span = document.createElement('span');
+        span.textContent = input.value;
+        li.insertBefore(span, input);
+        button.textContent = 'edit';
+        li.removeChild(input);
+      },
+    };
 
-    if(e.target.textContent === 'remove'){
-      ul.removeChild(li);
-    } else if (e.target.textContent === 'edit') {
-      // make label editable
-      const input = document.createElement('input');
-      input.type = 'text';
-      li.insertBefore(input, span);
-      input.value = span.textContent;
-      button.textContent = 'save';
-      li.removeChild(span);
-    } else if (e.target.textContent === 'save') {
-      // save entry
-      const input = li.firstChild;
-      const span = document.createElement('span');
-      span.textContent = input.value;
-      li.insertBefore(span, input);
-      button.textContent = 'edit';
-      li.removeChild(input);
-    }
+    // select and run action in button's name
+    actions[buttonAction]();
   }
 });
 
